@@ -9,6 +9,7 @@ from .insights import router as insights_router
 from .auth import router as auth_router
 from .moods import router as moods_router
 from backend.db.firebase_client import init_firebase
+from backend.services.scheduler import start_background_tasks, stop_background_tasks
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -51,13 +52,29 @@ app.include_router(insights_router, prefix="/api", tags=["Insights"])
 @app.on_event("startup")
 def startup_event():
     init_firebase()
-    logger.info("Firebase initialised")
+    logger.info("✓ Firebase initialised")
+    
+    try:
+        start_background_tasks()
+        logger.info("✓ Background tasks started")
+    except Exception as e:
+        logger.warning(f"Background tasks failed to start: {e}")
 
 # Root endpoint
 @app.get("/")
 def root():
     logger.info("Health check called")
     return {"status": "backend running"}
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    try:
+        stop_background_tasks()
+        logger.info("✓ Background tasks stopped")
+    except Exception as e:
+        logger.warning(f"Error stopping background tasks: {e}")
+
 
 # run
 # python -m uvicorn backend.api.main:app --reload
