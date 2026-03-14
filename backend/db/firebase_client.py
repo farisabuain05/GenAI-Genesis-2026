@@ -13,12 +13,11 @@ Role in system:
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore
-from typing import Optional
+from typing import Optional, Any
 from dotenv import load_dotenv
 load_dotenv()
 
-_db: Optional[firestore.client.Client] = None
-
+_db: Optional[Any] = None # Wildcard datatype for flexibility, but ideally should be firestore.client.Client. Why is this not working? Is it a circular import issue?
 
 def init_firebase() -> None:
     """
@@ -53,7 +52,7 @@ def init_firebase() -> None:
         raise RuntimeError(f"Failed to initialize Firebase: {str(e)}")
 
 
-def get_db() -> firestore.client.Client:
+def get_db() -> Any:  # can't access .Client on a function. Using Any for flexibility, but ideally should be more specific. Potentally fix later.
     """
     Get the Firestore database client.
     

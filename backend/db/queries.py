@@ -13,7 +13,7 @@ Role in system:
 
 from datetime import datetime
 from typing import List, Dict, Any, Optional
-from .firebase_client import get_db
+from .firebase_client import get_db   
 
 
 def save_entry(user_id: str, text: str, embedding: List[float]) -> str:
