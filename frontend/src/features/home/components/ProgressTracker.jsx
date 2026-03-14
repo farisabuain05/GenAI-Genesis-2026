@@ -39,7 +39,7 @@ const ProgressTracker = () => {
                     <div
                         key={i}
                         className={`${styles.day} ${i === TODAY ? styles.today :
-                                DONE_DAYS.includes(i) ? styles.done : ''
+                            DONE_DAYS.includes(i) ? styles.done : ''
                             }`}
                     >
                         {day}
