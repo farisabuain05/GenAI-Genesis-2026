@@ -10,9 +10,9 @@
 }
 
 .logo {
-    font-family: var(--font-sarif);
+    font-family: var(--font-serif);
     font-size: 24px;
-    columns: var(--color-green-text);
+    color: var(--color-green-text);
     letter-spacing: 0.02rem;
     padding: 0 8px;
     margin-bottom: 32px;
