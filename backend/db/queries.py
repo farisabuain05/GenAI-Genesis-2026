@@ -317,6 +317,118 @@ def get_user_long_term_memory(user_id: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def create_or_update_user_profile(user_id: str, email: str, display_name: str) -> None:
+    """
+    Create or update a user's profile in the 'users' collection.
+    Called on signup and profile updates.
+    
+    Args:
+        user_id: Firebase authentication user ID
+        email: User's email address
+        display_name: User's display name
+        
+    Returns:
+        None
+    """
+    db = get_db()
+    
+    user_data = {
+        "user_id": user_id,
+        "email": email,
+        "display_name": display_name,
+        "created_at": datetime.utcnow().isoformat(),
+        "last_active": datetime.utcnow().isoformat(),
+        "preferences": {
+            "notifications_enabled": True,
+            "notification_frequency": "daily",
+            "email_reminders": True
+        }
+    }
+    
+    db.collection("users").document(user_id).set(user_data, merge=True)
+
+
+def get_user_profile(user_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve a user's profile information from the 'users' collection.
+    
+    Args:
+        user_id: Firebase authentication user ID
+        
+    Returns:
+        User profile dict, or None if not found
+    """
+    db = get_db()
+    
+    doc = db.collection("users").document(user_id).get()
+    
+    if doc.exists():
+        return doc.to_dict()
+    
+    return None
+
+
+def update_user_activity(user_id: str) -> None:
+    """
+    Update a user's last_active timestamp.
+    Should be called on every user action (entry saved, mood logged, etc).
+    
+    Args:
+        user_id: Firebase authentication user ID
+        
+    Returns:
+        None
+    """
+    db = get_db()
+    
+    db.collection("users").document(user_id).update({
+        "last_active": datetime.utcnow().isoformat()
+    })
+
+
+def get_user_stats(user_id: str) -> Dict[str, Any]:
+    """
+    Get comprehensive user statistics for dashboard display.
+    
+    Args:
+        user_id: Firebase authentication user ID
+        
+    Returns:
+        Dictionary containing:
+            - total_entries: Total journal entries
+            - total_moods: Total mood check-ins
+            - mood_average: Average mood intensity (0-10)
+            - streak: Current check-in streak (days)
+            - recent_moods: Last 7 days of mood data
+    """
+    db = get_db()
+    
+    # Get entry count
+    entries = db.collection("diary_entries").where("user_id", "==", user_id).stream()
+    entry_count = sum(1 for _ in entries)
+    
+    # Get mood stats
+    moods = get_user_mood_history(user_id, days=30)
+    mood_count = len(moods)
+    
+    # Calculate average mood intensity
+    mood_avg = get_user_mood_average(user_id, days=30)
+    
+    # Get streak
+    streak = get_check_in_streak(user_id)
+    
+    # Get recent 7 days
+    recent_moods = get_user_mood_history(user_id, days=7)
+    
+    return {
+        "total_entries": entry_count,
+        "total_moods": mood_count,
+        "mood_average": round(mood_avg, 2),
+        "streak": streak,
+        "recent_moods": recent_moods
+    }
+
+
 if __name__ == "__main__":
     # Test database operations
     print("Database queries module loaded successfully")
@@ -332,3 +444,7 @@ if __name__ == "__main__":
     print("  - get_check_in_streak(user_id)")
     print("  - store_user_long_term_memory(user_id, memory)")
     print("  - get_user_long_term_memory(user_id)")
+    print("  - create_or_update_user_profile(user_id, email, display_name)")
+    print("  - get_user_profile(user_id)")
+    print("  - update_user_activity(user_id)")
+    print("  - get_user_stats(user_id)")

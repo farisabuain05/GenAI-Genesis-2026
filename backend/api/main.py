@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+import os
 
 from .diary import router as diary_router
 from .chat import router as chat_router
 from .insights import router as insights_router
+from .auth import router as auth_router
 from backend.db.firebase_client import init_firebase
 
 # Logging setup
@@ -18,16 +20,28 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS (allow React frontend)
+# CORS configuration - allow frontend + localhost for development
+cors_origins = [
+    "http://localhost:3000",  # React development
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",  # Vite development
+    "http://127.0.0.1:5173",
+]
+
+# Add production domain if available
+if os.getenv("FRONTEND_URL"):
+    cors_origins.append(os.getenv("FRONTEND_URL"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*", "Authorization"],
 )
 
 # Register routers
+app.include_router(auth_router, tags=["Authentication"])
 app.include_router(diary_router, prefix="/api", tags=["Diary"])
 app.include_router(chat_router, prefix="/api", tags=["Chat"])
 app.include_router(insights_router, prefix="/api", tags=["Insights"])
