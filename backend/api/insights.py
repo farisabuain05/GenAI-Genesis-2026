@@ -1,26 +1,54 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from backend.api.auth import get_current_user_id
 from backend.db.queries import (
     get_user_mood_history,
     get_user_mood_average,
     get_entry_count,
     get_check_in_streak,
+    get_user_stats,
 )
 
 router = APIRouter()
 
 
+@router.get("/stats/{user_id}")
+def get_user_statistics(user_id: str, current_user: str = Depends(get_current_user_id)):
+    """
+    Get user statistics for dashboard display.
+    Requires authentication - users can only access their own stats.
+    
+    Args:
+        user_id: User ID (from URL)
+        current_user: Authenticated user ID (from token)
+        
+    Returns:
+        Dictionary with user statistics
+    """
+    # Verify user is requesting their own data
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Cannot access other users' stats")
+    
+    stats = get_user_stats(user_id)
+    return stats
+
+
 @router.get("/progress/{user_id}")
-def get_progress(user_id: str):
+def get_progress(user_id: str, current_user: str = Depends(get_current_user_id)):
     """
     Returns comprehensive stats for the dashboard.
+    Requires authentication - users can only access their own progress.
     Queries Firestore for real user data.
     
     Args:
-        user_id: Unique user identifier
+        user_id: Unique user identifier (from URL)
+        current_user: Authenticated user ID (from token)
         
     Returns:
         Dictionary with user statistics and trends
     """
+    # Verify user is requesting their own data
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Cannot access other users' progress")
     
     # Get mood history for past 30 days
     mood_history = get_user_mood_history(user_id, days=30)

@@ -1,6 +1,8 @@
 import StarterKit from '@tiptap/starter-kit';
 import { useEditor, EditorContent } from '@tiptap/react';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AuthContext from '../../../contexts/AuthContext';
 import styles from './JournalEditor.module.css';
 import { saveJournalEntry, getProgress, updateProgress, getJournalEntries } from '../../../utils/storage';
 import ResponseDisplay from './ResponseDisplay';
@@ -75,12 +77,17 @@ const Toolbar = ({ editor }) => {
 };
 
 const JournalEditor = () => {
+    const { user, token } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [promptIndex, setPromptIndex] = useState(0);
     const [saved, setSaved] = useState(false);
     const [content, setContent] = useState('');
     const [apiResponse, setApiResponse] = useState(null);
     const [showSimilarModal, setShowSimilarModal] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
     const editor = useEditor({
         extensions: [StarterKit],
@@ -138,66 +145,62 @@ const JournalEditor = () => {
     };
 
     const handleSave = async () => {
-        if (isEmpty) return;
+        if (isEmpty || !user || !token) return;
         
         setLoading(true);
+        setError(null);
         
-        // Save to local storage
-        saveJournalEntry(PROMPTS[promptIndex], editor.getHTML());
+        try {
+            // Call backend API with authentication
+            const response = await fetch(`${API_BASE_URL}/api/journal-entry`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    user_id: user.uid,
+                    prompt: PROMPTS[promptIndex],
+                    entry: editor.getHTML(),
+                    entry_text: content, // Include plain text for analysis
+                }),
+            });
 
-        const progress = getProgress();
-        updateProgress({
-            journalCount: progress.journalCount + 1,
-            weeklyJournals: progress.weeklyJournals + 1,
-        });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to save entry');
+            }
 
-        // Simulate API response
-        const similarEntries = findSimilarEntries(content);
-        const similarityScores = similarEntries.map(() => (0.7 + Math.random() * 0.25).toFixed(2).map(Number));
-        
-        const mockResponse = {
-            success: true,
-            entry_id: `entry_${Date.now()}`,
-            mood_id: `mood_${Date.now()}`,
-            message: 'Journal entry saved',
-            prompt: PROMPTS[promptIndex],
-            mood: {
-                emotion: 'thoughtful',
-                intensity: 0.6,
-                themes: ['reflection', 'growth'],
-                risk_level: 'low',
-                needs_followup: false,
-                reasoning_summary: 'You seem to be in a reflective mood.'
-            },
-            response: {
-                reflection: 'It sounds like you\'re processing some important thoughts. That\'s a sign of growth.',
-                open_question: 'What would it feel like to take one small step forward today?',
-                coping_suggestion: 'Take a moment to acknowledge your reflection and write down one thing you\'re proud of.'
-            },
-            support_level: 'low',
-            updated_profile: {
-                common_stressors: [],
-                recurring_emotions: ['reflective', 'thoughtful'],
-                helpful_strategies: ['journaling'],
-                support_preferences: [],
-                recent_patterns: [],
-                summary: 'You are developing a journaling practice.'
-            },
-            safety_flag: false,
-            similar_entries: similarEntries,
-            similarity_scores: similarityScores,
-            similar_entries_used: similarEntries.length
-        };
+            const data = await response.json();
+            
+            // Also save to localStorage as fallback
+            saveJournalEntry(PROMPTS[promptIndex], editor.getHTML());
 
-        setApiResponse(mockResponse);
-        setSaved(true);
-        setLoading(false);
+            // Update progress
+            const progress = getProgress();
+            updateProgress({
+                journalCount: progress.journalCount + 1,
+                weeklyJournals: progress.weeklyJournals + 1,
+            });
+
+            setApiResponse(data);
+            setSaved(true);
+        } catch (err) {
+            console.error('Error saving journal entry:', err);
+            setError(err.message || 'Failed to save entry');
+            // Still save locally if backend fails
+            saveJournalEntry(PROMPTS[promptIndex], editor.getHTML());
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className={styles.wrapper}>
             {!apiResponse ? (
                 <>
+                    {error && <div className={styles.errorMessage}>{error}</div>}
+                    
                     {/* Prompt bar */}
                     <div className={styles.promptBar}>
                         <div className={styles.promptLeft}>

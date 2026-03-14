@@ -105,9 +105,18 @@ def get_all_entries(user_id: str) -> List[Dict[str, Any]]:
     return entries
 
 
-def save_mood(user_id: str, mood: str, intensity: int) -> str:
+def save_mood(user_id: str, mood: str, intensity: int, note: str = "") -> str:
     """
     Save a mood record for a user.
+    
+    Args:
+        user_id: Unique user identifier
+        mood: Mood/emotion label
+        intensity: Mood intensity (1-10 scale)
+        note: Optional note about the mood
+        
+    Returns:
+        mood_id: Auto-generated document ID
     """
     db = get_db()
 
@@ -117,6 +126,7 @@ def save_mood(user_id: str, mood: str, intensity: int) -> str:
         "user_id": user_id,
         "mood": mood,
         "intensity": intensity,
+        "note": note,
         "date": now.strftime("%Y-%m-%d"),
         "timestamp": now,
     }

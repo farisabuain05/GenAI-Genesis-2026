@@ -7,6 +7,7 @@ from .diary import router as diary_router
 from .chat import router as chat_router
 from .insights import router as insights_router
 from .auth import router as auth_router
+from .moods import router as moods_router
 from backend.db.firebase_client import init_firebase
 
 # Logging setup
@@ -43,6 +44,7 @@ app.add_middleware(
 # Register routers
 app.include_router(auth_router, tags=["Authentication"])
 app.include_router(diary_router, prefix="/api", tags=["Diary"])
+app.include_router(moods_router, prefix="/api", tags=["Moods"])
 app.include_router(chat_router, prefix="/api", tags=["Chat"])
 app.include_router(insights_router, prefix="/api", tags=["Insights"])
 
