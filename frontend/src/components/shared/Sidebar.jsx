@@ -1,4 +1,4 @@
-import styles from './Sidebar.module.css'
+import styles from './Sidebar.module.css';
 
 const NAV_ITEMS = [
     { icon: '⌂', label: 'Home', path: '/' },
