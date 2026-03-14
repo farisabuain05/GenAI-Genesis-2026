@@ -1,4 +1,4 @@
-import Sidebar from '../components/shared/sidebar'
+import Sidebar from '../components/shared/Sidebar.jsx'
 import styles from './AppLayout.module.css'
 
 const AppLayout = ({ children }) => {
