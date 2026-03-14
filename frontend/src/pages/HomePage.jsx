@@ -6,8 +6,6 @@ import ExerciseList from '../features/home/components/ExerciseList.jsx';
 import ProgressTracker from '../features/home/components/ProgressTracker.jsx';
 import { useNavigate } from 'react-router-dom';
 
-const navigate = useNavigate();
-
 const STATS = [
   { label: 'Check-in streak', value: '2', sub: '↑ days in a row', positive: true },
   { label: 'Sessions done', value: '5', sub: 'this month', positive: false },
@@ -16,6 +14,8 @@ const STATS = [
 ];
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.page}>
 
