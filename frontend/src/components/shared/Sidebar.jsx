@@ -1,4 +1,5 @@
 import styles from './Sidebar.module.css';
+import { NavLink } from 'react-router-dom';
 
 const NAV_ITEMS = [
     { icon: '🏠', label: 'Home', path: '/' },
@@ -27,14 +28,17 @@ const Sidebar = () => {
 
             <nav className={styles.nav}>
                 {NAV_ITEMS.map((item) => (
-                    <a
+                    <NavLink
                         key={item.path}
-                        href={item.path}
-                        className={`${styles.navItem} ${active === item.path ? styles.active : ''}`}
+                        to={item.path}
+                        end={item.path === '/'}
+                        className={({ isActive }) =>
+                            `${styles.navItem} ${isActive ? styles.active : ''}`
+                        }
                     >
                         <span className={styles.navIcon}>{item.icon}</span>
                         {item.label}
-                    </a>
+                    </NavLink>
                 ))}
             </nav>
 
