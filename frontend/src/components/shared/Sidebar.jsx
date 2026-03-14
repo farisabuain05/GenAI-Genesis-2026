@@ -9,8 +9,8 @@ const NAV_ITEMS = [
 ];
 
 const JOURNALS = [
-    { label: 'All entries', count: 24, color: '#7AAE6A' },
-    { label: 'Daily reflections', count: 12, color: '#A8C898' },
+    { label: 'All entries', count: 5, color: '#7AAE6A' },
+    { label: 'Daily reflections', count: 5, color: '#A8C898' },
     { label: 'Gratitude', count: 8, color: '#C9A07A' },
     { label: 'Anxiety log', count: 4, color: '#C4A0C0' },
 ];
