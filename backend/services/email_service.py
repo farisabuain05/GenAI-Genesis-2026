@@ -212,7 +212,7 @@ class EmailService:
                         </a>
                     </p>
                     
-                    <p>Happy journaling!<br>-Your New Personal Diary/p>
+                    <p>Happy journaling!<br>-Your New Personal Diary</p>
                 </div>
             </body>
         </html>
