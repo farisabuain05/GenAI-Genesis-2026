@@ -1,12 +1,14 @@
 import styles from './Sidebar.module.css';
 import { NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { getUserProfile } from '../../utils/storage';
 
 const NAV_ITEMS = [
     { icon: '🏠', label: 'Home', path: '/' },
     { icon: '📝', label: 'Journal', path: '/journal' },
-    { icon: '📆', label: 'Sessions', path: '/sessions' },
-    { icon: '⭐', label: 'Exercises', path: '/exercises' },
+    { icon: '💬', label: 'Chat', path: '/chat' },
     { icon: '📊', label: 'Progress', path: '/progress' },
+    { icon: '⚙', label: 'Settings', path: '/settings' }
 ];
 
 const JOURNALS = [
@@ -18,12 +20,18 @@ const JOURNALS = [
 
 const Sidebar = () => {
     // const active = '/';
+    const [profile, setProfile] = useState(getUserProfile());
+
+    useEffect(() => {
+        const onStorage = () => setProfile(getUserProfile());
+        window.addEventListener('storage', onStorage);
+        return () => window.removeEventListener('storage', onStorage);
+    }, []);
 
     return (
         <aside className={styles.sidebar}>
             <div className={styles.logo}>
-                {/* TODO: LOGO */}
-                LOGO<span className={styles.logoAccent}>.</span>
+                Dear AI-ry<span className={styles.logoAccent}>.</span>
             </div>
 
             <nav className={styles.nav}>
@@ -59,7 +67,7 @@ const Sidebar = () => {
             <div className={styles.footer}>
                 <div className={styles.avatar}>J</div>
                 <div>
-                    <div className={styles.userName}>John Doe</div>
+                    <div className={styles.userName}>{profile.name || 'Your name'}</div>
                     <div className={styles.userSub}>Member · Feburary 2026</div>
                 </div>
             </div>
