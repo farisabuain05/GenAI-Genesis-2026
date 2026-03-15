@@ -68,7 +68,6 @@ const Sidebar = () => {
                 <div className={styles.avatar}>J</div>
                 <div>
                     <div className={styles.userName}>{profile.name || 'Your name'}</div>
-                    <div className={styles.userSub}>Member · Feburary 2026</div>
                 </div>
             </div>
         </aside>
