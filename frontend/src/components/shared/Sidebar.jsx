@@ -69,6 +69,15 @@ const Sidebar = () => {
                 <div>
                     <div className={styles.userName}>{profile.name || 'Your name'}</div>
                 </div>
+
+                {showUserMenu && (
+                    <div className={styles.userMenu}>
+                        <button className={styles.settingsBtn}>⚙️ Settings</button>
+                        <button className={styles.logoutBtn} onClick={handleLogout}>
+                            🚪 Logout
+                        </button>
+                    </div>
+                )}
             </div>
         </aside>
     );
