@@ -3,7 +3,7 @@ import { getUserProfile, saveUserProfile } from '../utils/storage';
 import styles from './SettingsPage.module.css';
 
 // const AVATAR_COLORS = ['#3D5A3E', '#7AAE6A', '#C8955A', '#8A7DAE', '#5A8AAE', '#AE5A7D'];
-// const GOAL_OPTIONS = ['Reduce anxiety', 'Improve mood', 'Build resilience', 'Sleep better', 'Manage stress', 'Process emotions'];
+const GOAL_OPTIONS = ['Reduce anxiety', 'Improve mood', 'Build resilience', 'Sleep better', 'Manage stress', 'Process emotions'];
 const REMINDER_TIMES = ['Off', 'Daily', 'Every 3 Days', 'Weekly', 'Monthly'];
 // const THEMES = ['Soft Naturals', 'Night Mode'];
 
@@ -19,6 +19,7 @@ const SettingsPage = () => {
         theme: 'Soft Naturals',
         journalPrompts: true,
         moodReminders: true,
+        goals: [],
     });
     const [saved, setSaved] = useState(false);
 
@@ -31,14 +32,14 @@ const SettingsPage = () => {
 
     const update = (key, value) => setProfile(prev => ({ ...prev, [key]: value }));
 
-    // const toggleGoal = (goal) => {
-    //     setProfile(prev => ({
-    //         ...prev,
-    //         goals: prev.goals.includes(goal)
-    //             ? prev.goals.filter(g => g !== goal)
-    //             : [...prev.goals, goal],
-    //     }));
-    // };
+    const toggleGoal = (goal) => {
+        setProfile(prev => ({
+            ...prev,
+            goals: prev.goals.includes(goal)
+                ? prev.goals.filter(g => g !== goal)
+                : [...prev.goals, goal],
+        }));
+    };
 
     const handleSave = () => {
         saveUserProfile(profile);
