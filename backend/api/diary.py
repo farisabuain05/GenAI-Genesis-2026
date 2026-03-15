@@ -48,8 +48,14 @@ async def save_journal_entry(data: JournalEntryRequest, user_id: str = Depends(g
     all_entries = get_all_entries(user_id)
 
     print("Step 3: finding similar past entries")
-    similar_results = find_similar_entries(new_embedding, all_entries, top_k=3)
-    similar_entries = [entry for _, entry in similar_results]
+
+    similar_results = find_similar_entries(
+        new_embedding=new_embedding,
+        entries=all_entries,
+        top_k=3,
+    )
+
+    similar_entries = [entry for score, entry in similar_results]
 
     print("Step 4: running agent loop")
     # Use assistant_id based on user_id
