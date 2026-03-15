@@ -75,4 +75,7 @@ export const exportAllData = () => {
 };
 
 export const getUserProfile = () => JSON.parse(localStorage.getItem('app_user_profile') || '{}');
-export const saveUserProfile = (data) => localStorage.setItem('app_user_profile', JSON.stringify(data));
+export const saveUserProfile = (data) => {
+    localStorage.setItem('app_user_profile', JSON.stringify(data));
+    window.dispatchEvent(new Event('storage'));
+};

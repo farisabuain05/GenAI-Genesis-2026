@@ -5,7 +5,7 @@ import JournalPrompt from '../features/home/components/JournalPrompt.jsx';
 import ExerciseList from '../features/home/components/ExerciseList.jsx';
 import ProgressTracker from '../features/home/components/ProgressTracker.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getUserProfile } from '../../../utils/storage';
+import { getUserProfile } from '../utils/storage';
 
 const STATS = [
   { label: 'Check-in streak', value: '2', sub: '↑ days in a row', positive: true },
