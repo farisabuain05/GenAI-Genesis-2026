@@ -2,6 +2,8 @@ import styles from './Sidebar.module.css';
 import { NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getUserProfile } from '../../utils/storage';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const NAV_ITEMS = [
     { icon: '🏠', label: 'Home', path: '/' },
@@ -21,6 +23,24 @@ const JOURNALS = [
 const Sidebar = () => {
     // const active = '/';
     const [profile, setProfile] = useState(getUserProfile());
+
+    const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const handleLogout = () => {
+        setIsLoggingOut(true);
+
+        // Clear auth token from localStorage
+        localStorage.removeItem('authToken');
+
+        // Clear user data
+        localStorage.removeItem('userData');
+
+        // Redirect to login page (or home)
+        navigate('/');
+
+        console.log('User logged out successfully');
+    };
 
     useEffect(() => {
         const onStorage = () => setProfile(getUserProfile());
@@ -65,19 +85,23 @@ const Sidebar = () => {
             </div>
 
             <div className={styles.footer}>
-                <div className={styles.avatar}>J</div>
-                <div>
-                    <div className={styles.userName}>{profile.name || 'Your name'}</div>
-                </div>
+                {/* Logout Button */}
+                <button
+                    className={styles.logoutBtnTop}
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                >
+                    🚪 Logout
+                </button>
 
-                {showUserMenu && (
-                    <div className={styles.userMenu}>
-                        <button className={styles.settingsBtn}>⚙️ Settings</button>
-                        <button className={styles.logoutBtn} onClick={handleLogout}>
-                            🚪 Logout
-                        </button>
+                {/* User Section */}
+                <div className={styles.userSection}>
+                    <div className={styles.avatar}>J</div>
+                    <div>
+                        <div className={styles.userName}>John Doe</div>
+                        <div className={styles.userSub}>Member · Feburary 2026</div>
                     </div>
-                )}
+                </div>
             </div>
         </aside>
     );
