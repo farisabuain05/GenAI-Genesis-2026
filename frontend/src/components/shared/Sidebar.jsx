@@ -21,7 +21,7 @@ const JOURNALS = [
 
 const Sidebar = () => {
     const [profile, setProfile] = useState(getUserProfile());
-
+    const [showUserMenu, setShowUserMenu] = useState(false);
     useEffect(() => {
         const onStorage = () => setProfile(getUserProfile());
         window.addEventListener('storage', onStorage);
